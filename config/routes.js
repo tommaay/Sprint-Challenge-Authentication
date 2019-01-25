@@ -21,40 +21,51 @@ function generateToken(user) {
    const secret = jwtKey;
 
    const options = {
-      expires: '1m',
+      expiresIn: '1m',
    };
+
+   return jwt.sign(payload, secret, options);
 }
 
 function register(req, res) {
    // implement user registration
-   const cred = req.body;
-   const hash = bcrypt.hashSync(cred.password, 13);
+   const creds = req.body;
+   const hash = bcrypt.hashSync(creds.password, 13);
 
-   cred.password = hash;
+   creds.password = hash;
 
    db('users')
-      .insert(cred)
+      .insert(creds)
       .then(id => res.status(201).json(id))
       .catch(err => res.status(500).json(err));
 }
 
 function login(req, res) {
    // implement user login
-   const cred = req.body;
+   const creds = req.body;
 
    db('users')
-      .where({ username: cred.username })
+      .where({ username: creds.username })
       .first()
       .then(user => {
-         if (user && bcyrpt.compareSync(cred.password, user.password)) {
-            const token = generateToken(cred);
+         if (user && bcrypt.compareSync(creds.password, user.password)) {
+            const token = generateToken(user);
+
             res.status(200).json({
-               message: `Welcome back ${user.username}`,
+               message: `Welcome back ${user.username}!`,
                token,
+            });
+         } else {
+            res.status(401).json({
+               message: 'You are not authorized!',
             });
          }
       })
-      .catch(err => res.status(500).json(err));
+      .catch(err =>
+         res.status(500).json({
+            message: 'You shall not pass!!',
+         })
+      );
 }
 
 function getJokes(req, res) {
