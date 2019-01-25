@@ -18,42 +18,59 @@ class App extends Component {
       isLoggedIn: false,
    };
 
-   login(creds) {
+   componentWillReceiveProps() {}
+
+   login = (creds, getJokes) => {
       axios
          .post('http://localhost:3300/api/login', creds)
          .then(res => {
-            console.log('res.data', res.data);
-            this.setState({ token: res.data.token });
-            this.getJokes();
-            console.log('login', this.state);
+            const token = res.data.token;
+
+            localStorage.setItem('jwt', token);
+
+            this.setState({ token: token, isLoggedIn: true });
+            getJokes(token);
+            console.log('jokes', getJokes);
          })
          .catch(err => ({ message: 'Unable to login.' }));
-   }
+   };
 
-   register() {
+   register = (creds, getJokes) => {
       axios
-         .post('http://localhost:3300/api/register')
+         .post('http://localhost:3300/api/register', creds)
          .then(res => {
-            console.log('res.data', res.data);
-            this.setState({ token: res.data.token });
-            this.getJokes();
-            console.log('register', this.state);
+            const token = res.data.token;
+
+            localStorage.setItem('jwt', token);
+
+            this.setState({ token: res.data.token, isLoggedIn: true });
+            getJokes();
          })
          .catch(err => ({ message: 'Unable to register.' }));
-   }
+   };
 
-   getJokes() {
+   logout = () => {
+      localStorage.removeItem('jwt');
+      this.setState({
+         jokes: [],
+         message: null,
+         token: null,
+         isLoggedIn: false,
+      });
+   };
+
+   getJokes = token => {
       axios
-         .get('http://localhost:3300/api/jokes')
+         .get('http://localhost:3300/api/jokes', token)
          .then(res => this.setState({ jokes: res.data.value }))
          .catch(err => this.setState({ message: 'Unable to fetch jokes' }));
-   }
+   };
 
    render() {
-      // console.log(this.state.jokes);
+      console.log('render', this.state);
 
       const links = this.state.isLoggedIn ? (
-         <SignedinLinks />
+         <SignedinLinks logout={this.logout} />
       ) : (
          <SignedoutLinks />
       );

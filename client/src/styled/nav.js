@@ -5,7 +5,7 @@ export const Nav = styled.nav`
    width: 100%;
    padding: 15px;
    background: red;
-   text-align: right;
+   text-align: center;
    margin-bottom: 30px;
 `;
 

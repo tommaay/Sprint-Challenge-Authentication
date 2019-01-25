@@ -14,10 +14,11 @@ class Login extends Component {
       });
    };
 
-   submitHandler = e => {
+   submitHandler = (e, creds) => {
       e.preventDefault();
       this.props.login(this.state);
-      this.props.history.push('/jokes');
+      this.setState({ username: '', password: '' });
+      //   this.props.history.push('/jokes');
    };
 
    render() {

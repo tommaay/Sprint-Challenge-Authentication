@@ -14,15 +14,17 @@ export const Form = styled.form`
 
 export const Label = styled.label`
    font-size: 2rem;
-   margin: 5px 0;
+   margin: 15px 0;
 `;
 
 export const Input = styled.input`
    width: 80%;
-   font-size: 2rem;
+   font-size: 1.5rem;
    margin-bottom: 10px;
    border: 1px solid lightgray;
    border-radius: 5px;
+   text-align: center;
+   padding: 10px;
 `;
 
 export const Button = styled.button`
