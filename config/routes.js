@@ -70,7 +70,7 @@ function login(req, res) {
 
 function getJokes(req, res) {
    axios
-      .get('https://safe-falls-22549.herokuapp.com/random_ten')
+      .get('http://api.icndb.com/jokes/random/10')
       .then(response => {
          res.status(200).json(response.data);
       })
