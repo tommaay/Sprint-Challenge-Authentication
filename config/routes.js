@@ -28,13 +28,13 @@ function generateToken(user) {
 function register(req, res) {
    // implement user registration
    const cred = req.body;
-   const hash = bcyrpt.hashSync(cred.password, 13);
+   const hash = bcrypt.hashSync(cred.password, 13);
 
    cred.password = hash;
 
    db('users')
       .insert(cred)
-      .then(ids => res.status(201).json(ids))
+      .then(id => res.status(201).json(id))
       .catch(err => res.status(500).json(err));
 }
 
@@ -47,10 +47,14 @@ function login(req, res) {
       .first()
       .then(user => {
          if (user && bcyrpt.compareSync(cred.password, user.password)) {
-            const token = jwt;
+            const token = generateToken(cred);
+            res.status(200).json({
+               message: `Welcome back ${user.username}`,
+               token,
+            });
          }
       })
-      .catch();
+      .catch(err => res.status(500).json(err));
 }
 
 function getJokes(req, res) {
