@@ -18,7 +18,7 @@ class Register extends Component {
       e.preventDefault();
       this.props.register(this.state);
       this.setState({ username: '', password: '' });
-      //   this.props.history.push('/jokes');
+      this.props.history.push('/jokes');
    };
 
    render() {

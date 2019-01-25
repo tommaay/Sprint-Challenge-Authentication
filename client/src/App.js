@@ -16,11 +16,10 @@ class App extends Component {
       message: null,
       token: null,
       isLoggedIn: false,
+      loaded: false,
    };
 
-   componentWillReceiveProps() {}
-
-   login = (creds, getJokes) => {
+   login = creds => {
       axios
          .post('http://localhost:3300/api/login', creds)
          .then(res => {
@@ -29,13 +28,12 @@ class App extends Component {
             localStorage.setItem('jwt', token);
 
             this.setState({ token: token, isLoggedIn: true });
-            getJokes(token);
-            console.log('jokes', getJokes);
+            this.getJokes();
          })
          .catch(err => ({ message: 'Unable to login.' }));
    };
 
-   register = (creds, getJokes) => {
+   register = creds => {
       axios
          .post('http://localhost:3300/api/register', creds)
          .then(res => {
@@ -43,8 +41,11 @@ class App extends Component {
 
             localStorage.setItem('jwt', token);
 
-            this.setState({ token: res.data.token, isLoggedIn: true });
-            getJokes();
+            this.setState({
+               token: res.data.token,
+               isLoggedIn: true,
+            });
+            this.getJokes();
          })
          .catch(err => ({ message: 'Unable to register.' }));
    };
@@ -56,19 +57,27 @@ class App extends Component {
          message: null,
          token: null,
          isLoggedIn: false,
+         loaded: false,
       });
    };
 
-   getJokes = token => {
+   getJokes = () => {
+      const token = localStorage.getItem('jwt');
+
+      const options = {
+         headers: {
+            authorization: token,
+         },
+      };
+      console.log('options', options);
+
       axios
-         .get('http://localhost:3300/api/jokes', token)
-         .then(res => this.setState({ jokes: res.data.value }))
+         .get('http://localhost:3300/api/jokes', options)
+         .then(res => this.setState({ jokes: res.data.value, loaded: true }))
          .catch(err => this.setState({ message: 'Unable to fetch jokes' }));
    };
 
    render() {
-      console.log('render', this.state);
-
       const links = this.state.isLoggedIn ? (
          <SignedinLinks logout={this.logout} />
       ) : (
@@ -93,7 +102,12 @@ class App extends Component {
                   <Route
                      path="/jokes"
                      render={props => (
-                        <Jokes {...props} getJokes={this.getJokes} />
+                        <Jokes
+                           {...props}
+                           jokes={this.state.jokes}
+                           loaded={this.state.loaded}
+                           loggedIn={this.state.isLoggedIn}
+                        />
                      )}
                   />
                </Switch>
